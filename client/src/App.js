@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
-import Customer from './compoents/Customer';
+import Customer from 'C:/Users/2022-PC(T)-27/Desktop/SKT FLY AI 4기/Study/mini_project_na/management/client/src/compoents/Customer';
 import { Paper } from '@mui/material';
 import { styled } from '@mui/system';
 import Table from '@mui/material/Table';
@@ -12,7 +12,7 @@ import TableCell from '@mui/material/TableCell';
 
 const StyledPaper = styled(Paper)({
   width: '100%',
-  marginTop: 16, // 이것은 theme.spacing.unit * 3을 대체합니다.
+  marginTop: 16,
   overflowX: 'auto',
 });
 
@@ -20,32 +20,23 @@ const StyledTable = styled(Table)({
   minWidth: 1080,
 });
 
-const customers = [{
-  'id':1,
-  'image':"http://placeimg.com/150/300/any",
-  'name':'윤문섭',
-  'birthday':'910123',
-  'gender':'남자',
-  'job':'대학원',
-},
-{
-  'id':2,
-  'image':"http://placeimg.com/640/480/any",
-  'name':'홍길동',
-  'birthday':'910123',
-  'gender':'남자',
-  'job':'프로그래머',
-},
-{
-  'id':3,
-  'image':"http://placeimg.com/640/480/any",
-  'name':'우아',
-  'birthday':'910123',
-  'gender':'남자',
-  'job':'디자이너',
-}]
-
 const App = () => {
+  const [customers, setCustomers] = useState([]);
+
+  useEffect(() => {
+    const callApi = async () => {
+      try {
+        const response = await fetch('/api/customers');
+        const data = await response.json();
+        setCustomers(data);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      }
+    };
+
+    callApi();
+  }, []);
+
   return (
     <StyledPaper>
       <StyledTable>
@@ -60,7 +51,7 @@ const App = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-        {customers.map(c => (
+          {customers.map(c => (
             <Customer
               key={c.id}
               id={c.id}
@@ -71,6 +62,11 @@ const App = () => {
               job={c.job}
             />
           ))}
+          {customers.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={6}>데이터가 없습니다.</TableCell>
+            </TableRow>
+          )}
         </TableBody>
       </StyledTable>
     </StyledPaper>
