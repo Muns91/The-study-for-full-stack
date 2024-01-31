@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import logo from './logo.svg';
 import './App.css';
-import Customer from 'C:/Users/2022-PC(T)-27/Desktop/SKT FLY AI 4기/Study/mini_project_na/management/client/src/compoents/Customer';
+import Customer from './compoents/Customer';
+import CustomerAdd from './compoents/CustomerAdd';
 import { Paper, CircularProgress } from '@mui/material'; 
 import { styled } from '@mui/system';
 import Table from '@mui/material/Table';
@@ -28,78 +30,71 @@ const StyledTable = styled(Table)(({ theme }) => ({
 }));
 
 const App = () => {
-  const [customers, setCustomers] = useState([]);
-  const [completed, setCompleted] = useState(0);
-  let timer;
+  const [customers, setCustomers] = useState();
+  const [isLoading, setIsLoading] = useState();
+
+  const callApi = async () => {
+    setIsLoading(true);
+    try {
+      const response = await axios.get('/api/customers');
+      console.log(response.data);
+
+      const uniqueIds = new Set(response.data.map(customer => customer.id));
+      if (uniqueIds.size !== response.data.length) {
+        console.error('Duplicate or undefined ids found');
+      }
+      setCustomers(response.data);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const stateRefresh = () => {
+    setCustomers(null);
+    callApi();
+  };
 
   useEffect(() => {
-    const callApi = async () => {
-      try {
-        const response = await fetch('/api/customers');
-        const data = await response.json();
-        setCustomers(data);
-        setCompleted(1); // Set completed to 1 when data fetching is complete
-      } catch (error) {
-        console.error('Error fetching data:', error);
-        setCompleted(-1); // Set completed to -1 in case of an error
-      }
-    };
-
-    const progress = () => {
-      setCompleted((prevCompleted) => (prevCompleted >= 100 ? 0 : prevCompleted + 1));
-    };
-
-    timer = setInterval(progress, 10);
     callApi();
-
-    // Clean up the interval when the component unmounts
-    return () => {
-      clearInterval(timer);
-    };
   }, []);
 
   return (
-    <StyledPaper>
-      <StyledTable>
-        <TableHead>
-          <TableRow>
-            <TableCell>번호</TableCell>
-            <TableCell>이미지</TableCell>
-            <TableCell>이름</TableCell>
-            <TableCell>생년월일</TableCell>
-            <TableCell>성별</TableCell>
-            <TableCell>직업</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {customers.map((c) => (
-            <Customer
-              key={c.id}
-              id={c.id}
-              image={c.image}
-              name={c.name}
-              birthday={c.birthday}
-              gender={c.gender}
-              job={c.job}
-            />
-          ))}
-          {customers.length === 0 && (
+    <div>
+      <StyledPaper>
+        <StyledTable>
+          <TableHead>
             <TableRow>
-              <TableCell colSpan={6}>데이터가 없습니다.</TableCell>
-              <TableCell colSpan={6} align='center'>
-              <CircularProgress
-                    className={StyledTable.progress}
-                    variant="determinate"
-                    value={completed}
-                    size={40} // 크기 조절
-                    thickness={5} // 두께 조절
-                  />
-              </TableCell>
+              <TableCell>번호</TableCell>
+              <TableCell>이미지</TableCell>
+              <TableCell>이름</TableCell>
+              <TableCell>생년월일</TableCell>
+              <TableCell>성별</TableCell>
+              <TableCell>직업</TableCell>
             </TableRow>
-          )}
-        </TableBody>
-      </StyledTable>
-    </StyledPaper>
+          </TableHead>
+          <TableBody>
+            {customers?.map((customer, index) => (
+              <Customer key={customer.id} customer={customer} number={index + 1} />
+            ))}
+            {isLoading && (
+              <TableRow>
+                <TableCell colSpan={6} align='center'>
+                  <CircularProgress className={StyledTable.progress} size={40} thickness={5} />
+                </TableCell>
+              </TableRow>
+            )}
+            {!isLoading && !customers?.length && (
+              <TableRow>
+                <TableCell colSpan={6}>데이터가 없습니다.</TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </StyledTable>
+      </StyledPaper>
+      <CustomerAdd stateRefresh={stateRefresh}/>
+    </div>
   );
 };
 
