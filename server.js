@@ -65,6 +65,16 @@ app.post('/api/customers', upload.single('image'), async (req, res) => { // asyn
   }
 });
 
+// 고객 삭제 라우트 정의
+app.delete('/api/customers/:id', async (req, res) => { // async 키워드 추가
+  try {
+    await Customer.deleteOne({ _id: req.params.id }); // await 키워드 사용
+    res.status(200).send({ success: true, message: 'Customer deleted successfully.' });
+  } catch (error) {
+    res.status(500).send({ error: 'Failed to delete customer.' });
+  }
+});
+
 // 서버 시작
 app.listen(port, (err) => {
   if (err) {

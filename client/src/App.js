@@ -18,15 +18,16 @@ const StyledPaper = styled(Paper)({
   overflowX: 'auto',
 });
 
-const StyledTable = styled(Table)(({ theme }) => ({
+const StyledTable = styled(Table)({
   minWidth: 1080,
-  progress: {
-    margin: 'auto', // Center the CircularProgress horizontally and vertically
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: theme.spacing(2), // Add top margin if needed
-  },
+});
+
+const StyledProgress = styled(CircularProgress)(({ theme }) => ({
+  margin: 'auto', // Center the CircularProgress horizontally and vertically
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+  marginTop: theme.spacing(2), // Add top margin if needed
 }));
 
 const App = () => {
@@ -72,16 +73,17 @@ const App = () => {
               <TableCell>생년월일</TableCell>
               <TableCell>성별</TableCell>
               <TableCell>직업</TableCell>
+              <TableCell>설정</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {customers?.map((customer, index) => (
-              <Customer key={customer.id} customer={customer} number={index + 1} />
+              <Customer stateRefresh={stateRefresh} key={customer.id} customer={customer} number={index + 1} />
             ))}
             {isLoading && (
               <TableRow>
                 <TableCell colSpan={6} align='center'>
-                  <CircularProgress className={StyledTable.progress} size={40} thickness={5} />
+                  <StyledProgress size={40} thickness={5} />
                 </TableCell>
               </TableRow>
             )}
