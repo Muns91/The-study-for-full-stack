@@ -1,5 +1,7 @@
 ## Mangement System 
-## 본프로젝트는 React 강의 목적으로 만들어진 고객 관리 시스템입니다.
+## 본프로젝트는 SKT FLY AI 4기 스터디를 목적으로 만들어진 프로그램입니다
+## from 동빈나
+## 참고 ULR : https://www.youtube.com/watch?v=_yEH9mczm3g&list=PLGjfly1PH_x-hFoFr1_TaHyr1md9KQE7n&index=1
 
 # Getting Started with Create React App
 
